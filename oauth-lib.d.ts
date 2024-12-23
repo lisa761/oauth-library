@@ -1,5 +1,3 @@
-// oauth-lib.d.ts
-
 export interface OAuthClient {
   domain: string;
   clientId: string;
@@ -23,5 +21,4 @@ export function refreshToken(client: OAuthClient, refreshToken: string): Promise
 
 export function getUserInfo(client: OAuthClient, accessToken: string): Promise<UserInfo>;
 
-// export function logout(client: OAuthClient, returnToUrl: string): void;
 export function logout(client: OAuthClient, returnToUrl: string): string;
