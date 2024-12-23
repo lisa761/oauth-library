@@ -1,4 +1,6 @@
 # Browser Demo App using React
+[![Demo SPA](https://img.shields.io/badge/Demo-SPA-blue?style=for-the-badge)](https://oauth-library-demo-browser.netlify.app/)
+
 This React app uses the **OAuth client library** for OAuth authentication. The app allows users to log in using OAuth, retrieve their access tokens, refresh tokens, and fetch user information from the OAuth provider.
 
 The OAuth client library abstracts the core logic of handling OAuth authentication flows, ensuring that the app focuses on the UI and user experience.
