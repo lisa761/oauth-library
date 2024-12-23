@@ -1,14 +1,12 @@
 # OAuth Library
-
 This repository contains an OAuth client library and a React demo app that demonstrates how to integrate OAuth authentication using the authorization code flow. The OAuth client handles the authorization, token exchange, and refresh processes, while the React app allows users to login, refresh tokens, and logout.
 
 ## Table of Contents
 1. [OAuth Client Library](#oauth-client-library)
-2. [React Demo App](#react-demo-app)
-3. [Installation](#installation)
-4. [Configuration](#configuration)
-5. [Usage](#usage)
-6. [Security Considerations](#security-considerations)
+2. [Installation](#installation)
+3. [Configuration](#configuration)
+4. [Demo](#demo)
+5. [Security Considerations](#security-considerations)
 
 ---
 
@@ -33,7 +31,6 @@ The `OAuthClient` class helps handle OAuth flows, including:
 ---
 
 ## Installation
-
 To set up the project, follow these steps:
 
 ### 1. Clone the repository:
@@ -72,7 +69,6 @@ CLIENT_SECRET=your-client-secret
 ---
 
 ## Demo
-
 The demo apps provide a simple UI:
 - Initiate the OAuth login flow.
 - Handle the OAuth callback, exchange the authorization code for tokens, and fetch user info.
@@ -86,7 +82,6 @@ The demo apps provide a simple UI:
 - **Output Display**: Shows the fetched user info or any errors encountered during the process.
 
 ### 2. Running the Demo
-
 #### Browser App
 ```bash
 cd demo-browser
@@ -113,10 +108,11 @@ npm install
 npm run dev
 ```
 
+<img width="1342" alt="Screenshot 2024-12-23 at 4 26 56 PM" src="https://github.com/user-attachments/assets/51ba1ffe-46b4-434e-b531-6fc477a5ae01" />
+
 ---
 
 ## Security Considerations
-
 - **State Parameter**: The state parameter is used to prevent CSRF attacks. Always validate the state received in the OAuth callback to ensure it matches the one you initially sent.
 - **Token Storage**: Store sensitive tokens (such as access and refresh tokens) securely. Avoid storing them in places vulnerable to XSS attacks, like localStorage. Instead, consider using secure cookies or session storage.
 - **HTTPS**: Ensure that all communication with your OAuth provider and token endpoints is done over HTTPS to protect sensitive data from being intercepted.
