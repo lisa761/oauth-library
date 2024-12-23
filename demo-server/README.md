@@ -55,8 +55,8 @@ This function starts the OAuth authorization flow by generating the authorizatio
 
 **Usage:**
 ```typescript
-app.get('/login', (req, res) => {
-  const authUrl = oauthLib.startAuthFlow(client);
+app.get('/login', async (req, res) => {
+  const authUrl = await oauthLib.startAuthFlow(client);
   res.json({ authUrl });
 });
 ```

@@ -16,8 +16,8 @@ function App() {
     }
   }, [loggedIn]);
 
-  const handleLogin = () => {
-    login();
+  const handleLogin = async () => {
+    await login();
   }
 
   const handleRefresh = () => {

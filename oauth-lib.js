@@ -5,37 +5,69 @@ export class OAuthClient {
     this.redirectUri = redirectUri;
     this.clientSecret = clientSecret;
   }
+
+  base64URLEncode(buffer) {
+    return btoa(String.fromCharCode.apply(null, new Uint8Array(buffer)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '');
+  }
+
+  generateCodeVerifier() {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    const verifier = this.base64URLEncode(array);
+    return verifier;
+  }
+
+  async generateCodeChallenge(codeVerifier) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(codeVerifier);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    
+    return this.base64URLEncode(hash);
+  }
 }
 
-export function startAuthFlow(client) {
+export async function startAuthFlow(client) {
   const state = Math.random().toString(36).substring(2);
+  const codeVerifier = client.generateCodeVerifier();
+  const codeChallenge = await client.generateCodeChallenge(codeVerifier);
+
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem('oauth_state', state);
+    sessionStorage.setItem('oauth_code_verifier', codeVerifier);
+  } else {
+    global.oauthState = state;
+    global.oauthCodeVerifier = codeVerifier;
+  }
+
   const authUrl = new URL(`https://${client.domain}/authorize`);
   authUrl.searchParams.append('response_type', 'code');
   authUrl.searchParams.append('client_id', client.clientId);
   authUrl.searchParams.append('redirect_uri', client.redirectUri);
   authUrl.searchParams.append('scope', 'openid profile email offline_access');
   authUrl.searchParams.append('state', state);
-
-  // Store the state for later verification
-  if (typeof window !== 'undefined') {
-    sessionStorage.setItem('oauth_state', state); // For browser apps
-  } else {
-    global.oauthState = state; // For server-side apps
-  }
+  authUrl.searchParams.append('code_challenge', codeChallenge);
+  authUrl.searchParams.append('code_challenge_method', 'S256');
 
   return authUrl.toString();
 }
 
 export async function handleCallback(client, callbackParams) {
   const { state, code } = callbackParams;
-  let storedState;
+  let storedState, codeVerifier;
 
   if (typeof window !== 'undefined') {
     storedState = sessionStorage.getItem('oauth_state');
+    codeVerifier = sessionStorage.getItem('oauth_code_verifier');
     sessionStorage.removeItem('oauth_state');
+    sessionStorage.removeItem('oauth_code_verifier');
   } else {
     storedState = global.oauthState;
+    codeVerifier = global.oauthCodeVerifier;
     global.oauthState = null;
+    global.oauthCodeVerifier = null;
   }
 
   if (!state || state !== storedState) {
@@ -58,6 +90,7 @@ export async function handleCallback(client, callbackParams) {
       client_id: client.clientId,
       redirect_uri: client.redirectUri,
       code,
+      code_verifier: codeVerifier,
       ...(client.clientSecret && { client_secret: client.clientSecret })
     }),
   });

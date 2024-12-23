@@ -44,7 +44,7 @@ This function starts the OAuth authorization flow by generating the authorizatio
 **Usage:**
 ```typescript
 const handleLogin = () => {
-  const authUrl = startAuthFlow(client.current);
+  const authUrl = await startAuthFlow(client.current);
   window.location.href = authUrl;
 }
 ```

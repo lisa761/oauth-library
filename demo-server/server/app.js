@@ -21,7 +21,7 @@ app.use(
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 24 * 60 * 60 * 1000,
     }
   })
@@ -34,8 +34,8 @@ const client = new oauthLib.OAuthClient(
   process.env.CLIENT_SECRET,
 );
 
-app.get('/login', (req, res) => {
-  const authUrl = oauthLib.startAuthFlow(client);
+app.get('/login', async (req, res) => {
+  const authUrl = await oauthLib.startAuthFlow(client);
   res.json({ authUrl });
 });
 

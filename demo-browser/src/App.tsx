@@ -47,8 +47,8 @@ const App: FC = () => {
     }
   }, []);
 
-  const handleLogin = () => {
-    const authUrl = startAuthFlow(client.current);
+  const handleLogin = async () => {
+    const authUrl = await startAuthFlow(client.current);
     window.location.href = authUrl;
   }
 
