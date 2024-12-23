@@ -109,8 +109,7 @@ This function generates the URL to log the user out from the OAuth provider. It 
 **Usage:**
 ```typescript
 app.get('/logout', (req, res) => {
-  req.session.accessToken = null;
-  req.session.refreshToken = null;
+  req.session.destroy();
   const logoutUrl = oauthLib.logout(client, process.env.ORIGIN_URL);
   res.json({ logoutUrl });
 });

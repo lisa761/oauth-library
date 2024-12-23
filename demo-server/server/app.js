@@ -17,6 +17,13 @@ app.use(
     secret: 'secret-key',
     resave: false,
     saveUninitialized: true,
+    proxy: true,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      sameSite: 'none',
+      maxAge: 24 * 60 * 60 * 1000,
+    }
   })
 );
 
@@ -65,8 +72,7 @@ app.get('/refresh', async (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-  req.session.accessToken = null;
-  req.session.refreshToken = null;
+  req.session.destroy();
   const logoutUrl = oauthLib.logout(client, process.env.ORIGIN_URL);
   res.json({ logoutUrl });
 });
