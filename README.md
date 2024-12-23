@@ -1,4 +1,8 @@
 # OAuth Library
+
+[![Demo SPA](https://img.shields.io/badge/Demo-SPA-blue?style=for-the-badge)](https://oauth-library-demo-browser.netlify.app/)
+[![Demo Regular](https://img.shields.io/badge/Demo-Regular-green?style=for-the-badge)](https://oauth-library-demo-server.netlify.app/)
+
 This repository contains an OAuth client library and a React demo app that demonstrates how to integrate OAuth authentication using the authorization code flow. The OAuth client handles the authorization, token exchange, and refresh processes, while the React app allows users to login, refresh tokens, and logout.
 
 ## Table of Contents
