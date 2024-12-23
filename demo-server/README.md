@@ -43,7 +43,7 @@ This is the main class that holds the configuration for the OAuth client. It is 
 const client = new oauthLib.OAuthClient(
   process.env.DOMAIN,
   process.env.CLIENT_ID,
-  'http://localhost:4000/callback',
+  process.env.CALLBACK_URL,
   process.env.CLIENT_SECRET,
 );
 ```
@@ -111,7 +111,7 @@ This function generates the URL to log the user out from the OAuth provider. It 
 app.get('/logout', (req, res) => {
   req.session.accessToken = null;
   req.session.refreshToken = null;
-  const logoutUrl = oauthLib.logout(client, 'http://localhost:3000/');
+  const logoutUrl = oauthLib.logout(client, process.env.ORIGIN_URL);
   res.json({ logoutUrl });
 });
 ```

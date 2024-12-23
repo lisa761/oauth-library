@@ -7,7 +7,7 @@ const oauthLib = require('../../oauth-lib.js');
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.ORIGIN_URL,
   credentials: true,
 }));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,7 +23,7 @@ app.use(
 const client = new oauthLib.OAuthClient(
   process.env.DOMAIN,
   process.env.CLIENT_ID,
-  'http://localhost:4000/callback',
+  process.env.CALLBACK_URL,
   process.env.CLIENT_SECRET,
 );
 
@@ -42,7 +42,7 @@ app.get('/callback', async (req, res) => {
     const tokenResponse = await oauthLib.handleCallback(client, { code, state });
     req.session.accessToken = tokenResponse.access_token;
     req.session.refreshToken = tokenResponse.refresh_token;
-    res.redirect('http://localhost:3000/');
+    res.redirect(process.env.ORIGIN_URL);
   } catch (error) {
     console.error('Error during callback handling:', error);
     res.status(500).send('Failed to complete the OAuth flow.');
@@ -67,7 +67,7 @@ app.get('/refresh', async (req, res) => {
 app.get('/logout', (req, res) => {
   req.session.accessToken = null;
   req.session.refreshToken = null;
-  const logoutUrl = oauthLib.logout(client, 'http://localhost:3000/');
+  const logoutUrl = oauthLib.logout(client, process.env.ORIGIN_URL);
   res.json({ logoutUrl });
 });
 

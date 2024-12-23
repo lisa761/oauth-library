@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:4000"; // Backend server URL
+const API_URL = import.meta.env.VITE_API_URL; // Backend server URL
 
 export async function isLoggedIn() {
   const response = await fetch(`${API_URL}/auth/check`, { credentials: "include" });
