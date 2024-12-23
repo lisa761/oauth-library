@@ -1,20 +1,20 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require("cors");
-const session = require("express-session");
+const cors = require('cors');
+const session = require('express-session');
 const oauthLib = require('../../oauth-lib.js');
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: 'http://localhost:3000',
   credentials: true,
 }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(
   session({
-    secret: "super-secret-key",
+    secret: 'secret-key',
     resave: false,
     saveUninitialized: true,
   })
@@ -51,7 +51,7 @@ app.get('/callback', async (req, res) => {
 
 app.get('/user', async (req, res) => {
   try {
-    userInfo = await oauthLib.getUserInfo(client, req.session.accessToken);
+    const userInfo = await oauthLib.getUserInfo(client, req.session.accessToken);
     res.json({ userInfo })
   } catch (error) {
     console.error('Error during fetching users:', error);
@@ -72,7 +72,7 @@ app.get('/logout', (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 4000;
+const PORT = 4000;
 app.listen(PORT, () => {
   console.log(`Express app running on http://localhost:${PORT}`);
 });

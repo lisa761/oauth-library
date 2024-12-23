@@ -14,8 +14,9 @@ const App: FC = () => {
     new OAuthClient(
       import.meta.env.VITE_DOMAIN,
       import.meta.env.VITE_CLIENT_ID,
-      window.location.origin)
-    );
+      window.location.origin,
+    )
+  );
   const [output, setOutput] = useState<string>('');
   const refreshTokenValue = useRef<any>(null);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
