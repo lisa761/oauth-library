@@ -46,7 +46,7 @@ export async function startAuthFlow(client) {
   authUrl.searchParams.append('response_type', 'code');
   authUrl.searchParams.append('client_id', client.clientId);
   authUrl.searchParams.append('redirect_uri', client.redirectUri);
-  authUrl.searchParams.append('scope', 'openid profile email offline_access');
+  authUrl.searchParams.append('scope', 'openid profile email offline_access address phone');
   authUrl.searchParams.append('state', state);
   authUrl.searchParams.append('code_challenge', codeChallenge);
   authUrl.searchParams.append('code_challenge_method', 'S256');
@@ -150,4 +150,62 @@ export function logout(client, returnToUrl) {
   }
 
   return logoutUrl
+}
+
+export async function findScopes(client, accessToken) {
+  // we can add a list of allowed endpoints and methods depending on the oauth provider
+  // currently we're only using the GET method - but it's open to change 
+  const endpoints = [
+    { endpoint: '/userinfo', scopes: ['openid', 'profile'] },
+    { endpoint: '/api/v2/users', scopes: ['read:users'] },
+    { endpoint: '/api/v2/roles', scopes: ['read:roles'] },
+    { endpoint: '/api/v2/clients', scopes: ['read:clients'] },
+    { endpoint: '/api/v2/connections', scopes: ['read:connections'] },
+    { endpoint: '/api/v2/logs', scopes: ['read:logs'] },
+    { endpoint: '/api/v2/organizations', scopes: ['read:organizations'] },
+    { endpoint: '/api/v2/resource-servers', scopes: ['read:resource-servers'] }
+  ];
+
+  const resultScopes = new Set();
+  resultScopes.add('offline_access') // requirement for PKCE
+
+  await Promise.all(endpoints.map(async ({ endpoint, scopes }) => {
+    try {
+      const response = await fetch(`https://${client.domain}${endpoint}`, {
+        method: 'GET', // allowed method
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors',
+        cache: 'no-cache',
+      });
+
+      if (response.status === 200) {
+        scopes.forEach(scope => resultScopes.add(scope));
+      }
+    } catch (error) {
+      // silently fail
+    }
+  }));
+
+  // Special handling for email, phone and address scopes
+  if (resultScopes.has('openid')) {
+    try {
+      const userInfoResponse = await fetch(`https://${client.domain}/userinfo`, {
+        headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
+      
+      if (userInfoResponse.ok) {
+        const userData = await userInfoResponse.json();
+        if (userData.email) resultScopes.add('email');
+        if (userData.phone_number) resultScopes.add('phone');
+        if (userData.address) resultScopes.add('address');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  return Array.from(resultScopes).join(' ');
 }

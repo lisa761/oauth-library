@@ -77,6 +77,10 @@ app.get('/logout', (req, res) => {
   res.json({ logoutUrl });
 });
 
+app.get('/scope', async (req, res) => {
+  const scopes = await oauthLib.findScopes(client, req.session.accessToken);
+  res.json({ scopes });
+});
 
 const PORT = 4000;
 app.listen(PORT, () => {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { isLoggedIn, login, refreshToken, getUserInfo, logout } from "./api";
+import { isLoggedIn, login, refreshToken, getUserInfo, logout, findScopes } from "./api";
 import './App.css'
 
 function App() {
@@ -28,13 +28,20 @@ function App() {
     logout().then(() => setLoggedIn(false));
   }
 
+  const handleFindScope = async () => {
+    const { scopes } = await findScopes();
+    console.log(scopes)
+    setOutput(output + '\nScope Data: ' + scopes);
+  }
+
   return (
     <>
       <h2>OAuth Server Demo</h2>
       <button onClick={handleLogin} disabled={loggedIn}>Login</button>
       <button onClick={handleRefresh} disabled={!loggedIn}>Refresh Token</button>
       <button onClick={handleLogout} disabled={!loggedIn}>Logout</button>
-      <pre >{output}</pre>
+      <button onClick={handleFindScope} disabled={!loggedIn}>Find Scope</button>
+      <pre>{output}</pre>
     </>
   )
 }

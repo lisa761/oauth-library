@@ -22,3 +22,5 @@ export function refreshToken(client: OAuthClient, refreshToken: string): Promise
 export function getUserInfo(client: OAuthClient, accessToken: string): Promise<UserInfo>;
 
 export function logout(client: OAuthClient, returnToUrl: string): string;
+
+export function findScopes(client: OAuthClient, accessToken: string): string;

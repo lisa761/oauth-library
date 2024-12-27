@@ -6,6 +6,7 @@ import {
   refreshToken,
   getUserInfo,
   logout,
+  findScopes,
 } from '../../oauth-lib';
 import './App.css'
 
@@ -18,6 +19,7 @@ const App: FC = () => {
     )
   );
   const [output, setOutput] = useState<string>('');
+  const accessTokenValue = useRef<any>(null);
   const refreshTokenValue = useRef<any>(null);
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
@@ -29,9 +31,10 @@ const App: FC = () => {
     try {
       const tokens = await handleCallback(client.current, { code, state });
       const userInfo = await getUserInfo(client.current, tokens.access_token);
-
-      setOutput(JSON.stringify(userInfo, null, 2))
+      accessTokenValue.current = tokens.access_token;
       refreshTokenValue.current = tokens.refresh_token;
+
+      setOutput(JSON.stringify(userInfo, null, 2));
       setLoggedIn(true);
       window.history.replaceState({}, document.title, client.current.redirectUri)
     } catch (error: any) {
@@ -55,6 +58,7 @@ const App: FC = () => {
   const handleRefresh = async () => {
     try {
       const tokens = await refreshToken(client.current, refreshTokenValue.current);
+      accessTokenValue.current = tokens.access_token;
       refreshTokenValue.current = tokens.refresh_token;
       setOutput(output + '\nRefreshed Token');
     } catch (error: any) {
@@ -69,13 +73,19 @@ const App: FC = () => {
     setOutput('');
   }
 
+  const handleFindScope = async () => {
+    const scopeData = await findScopes(client.current, accessTokenValue.current);
+    setOutput(output + '\nScope Data: ' + scopeData);
+  }
+
   return (
     <>
       <h2>OAuth Browser Demo</h2>
-      <button id="login-btn" onClick={handleLogin} disabled={loggedIn}>Login</button>
-      <button id="refresh-btn" onClick={handleRefresh} disabled={!loggedIn}>Refresh Token</button>
-      <button id="logout-btn" onClick={handleLogout} disabled={!loggedIn}>Logout</button>
-      <pre id="output">{output}</pre>
+      <button onClick={handleLogin} disabled={loggedIn}>Login</button>
+      <button onClick={handleRefresh} disabled={!loggedIn}>Refresh Token</button>
+      <button onClick={handleLogout} disabled={!loggedIn}>Logout</button>
+      <button onClick={handleFindScope} disabled={!loggedIn}>Find Scope</button>
+      <pre>{output}</pre>
     </>
   )
 }
